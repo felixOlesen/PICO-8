@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 42
+version 43
 __lua__
 function _init()
 	game_state=1
@@ -40,6 +40,9 @@ if global_time%fire_freq==0 then
 end
 	if #fire_parts>0 then
 		move_parts()
+	end
+	if #bgcircles>0 then
+		move_bgcircles()
 	end
 end
 
@@ -85,10 +88,10 @@ function move_parts()
 end
 
 function move_bgcircles()
-	for circle in all(bgcircles)do
-		circle.x+=sin(global_time/360)
-		circle.y+=part.spdy
-	end
+	sign_scalar=cos((global_time)/9)*0.3
+	bgcircles[1].r+=sign_scalar
+	bgcircles[2].r+=sign_scalar
+	bgcircles[3].r+=sign_scalar
 end
 -->8
 --draw
@@ -112,6 +115,7 @@ if fire_parts!=nil then
 	print("spd: "..part_spd)
 	
 	print("bg_circs:  "..#bgcircles)
+	print(sin(global_time/360),100,100,13)
 end
 	
 end
@@ -208,7 +212,7 @@ function add_bgcircs()
 	
 circ_dark_grey={x=64,y=64,r=32,c=5}
 circ_light_grey={x=64,y=64,r=16,c=6}
-circ_white={x=64,y=64,r=4,c=7}
+circ_white={x=64,y=64,r=6,c=7}
 
 add(bgcircles,circ_dark_grey)
 add(bgcircles,circ_light_grey)
