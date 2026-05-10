@@ -27,13 +27,16 @@ function init_grid()
 	screen_size=128
 	num_cells=0
 	grid_col=5
+	line_col=1
 	grid={}
 
 	num_cells=screen_size/cell_size
 	for y=1, num_cells do
 		add(grid, {})
 		for x=1, num_cells do
-			add(grid[y],1)
+			local tile_type=rnd(2)
+			if(tile_type>=1) add(grid[y],3)
+			if(tile_type<1) add(grid[y],12)
 		end
 	end
 end
@@ -56,14 +59,14 @@ function draw_grid_square(cell_x,cell_y)
 	local y_1=cell_y*cell_size
 	local x_0=x_1-cell_size
 	local y_0=y_1-cell_size
-	
+	local cell_col=grid[cell_y][cell_x]
 	if cell_x >= num_cells then
 		x_1-=1
 	end
 	if cell_y >= num_cells then
 		y_1-=1
 	end
-	rect(x_0,y_0,x_1,y_1,grid_col)	
+	rectfill(x_0,y_0,x_1,y_1,cell_col)	
 end
 -->8
 -- player controller
