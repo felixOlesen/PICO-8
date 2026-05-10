@@ -3,20 +3,21 @@ version 43
 __lua__
 -- main hooks
 function _init()
-	
+	global_time=0
 	init_grid()
 	init_player()
 end
 
 function _update()
 	update_player()
+	global_time+=1
 end
 
 function _draw()
 	cls(grid_col)
 	draw_grid()
 	draw_player()
-	
+	print("timer:"..global_time,66,1)
 end
 -->8
 -- grid manager
@@ -25,20 +26,76 @@ function init_grid()
 
 	cell_size=8
 	screen_size=128
-	num_cells=0
 	grid_col=5
 	line_col=1
+	water=12
+	grass=3
+	dirt=4
 	grid={}
-
 	num_cells=screen_size/cell_size
+	
+	-- procedural generation
+	local num_passes=10
+	dirt_weight=1.2
+	water_weight=1
+	grass_weight=1.2
+	
+	initial_pass()
+	procedural_gen(num_passes)
+end
+
+function initial_pass()
 	for y=1, num_cells do
 		add(grid, {})
 		for x=1, num_cells do
-			local tile_type=rnd(2)
-			if(tile_type>=1) add(grid[y],3)
-			if(tile_type<1) add(grid[y],12)
+			local tile_type=rnd(3)
+			if(tile_type<1) add(grid[y],dirt)
+			if(tile_type>=1 and tile_type<2) add(grid[y],grass)
+			if(tile_type>=2) add(grid[y],water)
 		end
 	end
+end
+
+function procedural_gen(num_passes)
+	
+	for i=1,num_passes do
+		local new_grid={}
+		for y=1, num_cells do
+			add(new_grid,{})
+			for x=1, num_cells do
+				local tile_counts=count_adjacent_tiles(x,y)
+				local gr_prob=(tile_counts.gr/8)*grass_weight
+				local wa_prob=(tile_counts.wa/8)*water_weight
+				local di_prob=(tile_counts.di/8)*dirt_weight
+				local prob_sum=gr_prob+wa_prob+di_prob
+				local choice=rnd(prob_sum)
+				
+				if(choice>di_prob+wa_prob) add(new_grid[y],grass)
+				if(choice<=di_prob+wa_prob and choice>di_prob) add(new_grid[y],water)
+				if(choice<=di_prob) add(new_grid[y],dirt)
+			end
+		end
+		grid=new_grid	
+	end
+end
+
+function count_adjacent_tiles(x,y)
+	local counts={gr=0,wa=0,di=0}
+	local cell_type=grass
+	for i=-1,1 do
+		for j=-1,1 do
+			if not(i==0 and j==0) then
+				if x+i>=1 and y+j>=1 and x+i<num_cells and y+j<num_cells then
+					cell_type=grid[y+j][x+i]
+					if(cell_type==grass) counts.gr+=1
+					if(cell_type==water) counts.wa+=1
+					if(cell_type==dirt) counts.di+=1
+				end
+			end
+		end
+	end
+	
+	return counts
 end
 
 function grid_update()
@@ -108,9 +165,9 @@ function draw_on_grid(x,y,spr_id,scale)
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0bb00bb0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0b0000b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01100110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0b0000b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-0bb00bb0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+01100110000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
