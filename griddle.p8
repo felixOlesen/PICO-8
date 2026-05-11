@@ -150,7 +150,12 @@ function draw_grid_square(cell_x,cell_y)
 	if cell_y >= num_cells then
 		y_1-=1
 	end
-	rectfill(x_0,y_0,x_1,y_1,cell_col)	
+	if cell_size<=1 then
+		pset(x_0,y_0,cell_col)
+	else
+		rectfill(x_0,y_0,x_1,y_1,cell_col)
+	end
+	
 end
 -->8
 -- player controller
@@ -195,6 +200,46 @@ function draw_on_grid(x,y,spr_id,scale)
  
  spr(spr_id,x_pos,y_pos)
 end
+-->8
+-- ideas/todo
+--[[
+ideas:
+- save mechanic for selecting 
+		a generated map and making 
+		it persist.
+		- reduces the compute needed 
+				for generation on start.
+				
+- zoom in/out mechanic where 
+		you have 1 or 2 pixel cell 
+		size and can zoom in to 
+		increase cell size and make 
+		map features bigger.
+		- when zoomed out, enemy pres-
+				ence is red, yours is blue
+
+- fog of war mechanic where the 
+		map is still generated but not 
+		visible unless explored.
+		- like an rts, make enemy move-
+				ment not visible.
+ 
+- traversing outside the map
+		requires either generating
+		connecting area, or if zoomed,
+		the next pixel over.
+
+todo:
+
+- optimise the generation algo-
+		rithm.
+		- improve looping through the
+				grid.
+
+completed:
+
+
+]]
 __gfx__
 00000000111100001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 01100110100100000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
