@@ -3,21 +3,37 @@ version 43
 __lua__
 -- main hooks
 function _init()
-	global_time=0
+	glob_state={glob_time=0,
+													state="main_menu",
+													debug=true
+												}
 	init_grid()
 	init_player()
 end
 
 function _update()
 	update_player()
-	global_time+=1
+	update_grid()
+	update_ui()
+	glob_state.glob_time+=1
 end
 
 function _draw()
-	cls(grid_col)
-	draw_grid()
-	draw_player()
-	print("timer:"..global_time,66,1)
+	
+	if(glob_state.state=="main_menu") then
+		cls(1)
+		draw_grid()
+		draw_ui()
+	else
+		cls(0)
+		draw_ui()
+		draw_grid()
+		draw_player()
+	end
+	
+	if(glob_state.debug) then
+		print("timer:"..glob_state.glob_time,66,1)	
+	end
 end
 -->8
 -- grid manager
@@ -125,7 +141,7 @@ function highlight_pass()
 		grid=new_grid	
 end
 
-function grid_update()
+function update_grid()
 	
 end
 
@@ -188,17 +204,29 @@ function move_check()
 	if(btnp(3) and player.y+1<num_cells) player.y+=1
 end
 -->8
--- helpers
+-- ui
 
--- game logic
+function init_ui()
+	
+end
 
--- drawing
+function update_ui()
+	
+end
 
-function draw_on_grid(x,y,spr_id,scale)
- local x_pos=x*cell_size
- local y_pos=y*cell_size
- 
- spr(spr_id,x_pos,y_pos)
+function draw_ui()
+	if(glob_state.state=="main_menu") then
+		-- background shapes
+		rectfill(5,30,50,100,1)
+		-- ui text
+		print("griddle",8,33,9)	
+		print("start",11,42,6)
+		print("settings",11,51,6)
+		print("exit",11,60,6)
+		
+	else
+		
+	end
 end
 -->8
 -- ideas/todo
@@ -240,6 +268,19 @@ completed:
 
 
 ]]
+-->8
+-- helpers
+
+-- game logic
+
+-- drawing
+
+function draw_on_grid(x,y,spr_id,scale)
+ local x_pos=x*cell_size
+ local y_pos=y*cell_size
+ 
+ spr(spr_id,x_pos,y_pos)
+end
 __gfx__
 00000000111100001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 01100110100100000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
