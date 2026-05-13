@@ -9,6 +9,7 @@ function _init()
 												}
 	init_grid()
 	init_player()
+	init_ui()
 end
 
 function _update()
@@ -33,6 +34,7 @@ function _draw()
 	
 	if(glob_state.debug) then
 		print("timer:"..glob_state.glob_time,66,1)	
+		print("ui_option:"..ui_option,2,4,7)
 	end
 end
 -->8
@@ -207,23 +209,45 @@ end
 -- ui
 
 function init_ui()
-	
+	ui_option=1	
 end
 
 function update_ui()
+	if(glob_state.state=="main_menu") then
+		if(btnp(2) and ui_option>1) ui_option-=1
+		if(btnp(3) and ui_option<3) ui_option+=1	
+		if(btnp(❎)) then
+			if(ui_option==1) glob_state.state="started"
+			if(ui_option==2) glob_state.state="settings"
+			if(ui_option==3) glob_state.state="exit"
+		end
+	end
 	
 end
 
 function draw_ui()
 	if(glob_state.state=="main_menu") then
 		-- background shapes
-		rectfill(5,30,50,100,1)
-		-- ui text
-		print("griddle",8,33,9)	
-		print("start",11,42,6)
-		print("settings",11,51,6)
-		print("exit",11,60,6)
+		local offset=17
+		rectfill(5,30+offset,50,70+offset,1)
+		rect(5,30+offset,50,70+offset,0)
 		
+		
+		-- ui text
+		print("griddle",8,33+offset,9)	
+		print("start",11,43+offset,6)
+		print("settings",11,52+offset,6)
+		print("exit",11,61+offset,6)
+		if(ui_option==1) then
+			rect(9,41+offset,31,49+offset,7)
+			print("start",11,43+offset,11)
+		elseif(ui_option==2) then
+			rect(9,50+offset,43,58+offset,7)
+			print("settings",11,52+offset,7)
+		elseif(ui_option==3) then
+			rect(9,59+offset,27,67+offset,7)
+			print("exit",11,61+offset,8)
+		end
 	else
 		
 	end
