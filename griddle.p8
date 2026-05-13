@@ -25,11 +25,11 @@ function _draw()
 		cls(1)
 		draw_grid()
 		draw_ui()
-	else
+	elseif(glob_state.state=="started") then
 		cls(0)
-		draw_ui()
 		draw_grid()
 		draw_player()
+		draw_ui()
 	end
 	
 	if(glob_state.debug) then
