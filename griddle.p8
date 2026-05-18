@@ -29,6 +29,9 @@ function _draw()
 		cls(1)
 		draw_grid()
 		draw_ui()
+	elseif(glob_state.state=="settings") then
+		draw_grid()
+		draw_ui()
 	elseif(glob_state.state=="started") then
 		cls(0)
 		draw_grid()
@@ -214,13 +217,22 @@ end
 -- ui
 
 function init_ui()
-	ui_option=1	
+	ui_option=1
+	settings_state=	
 end
 
 function update_ui()
 	if(glob_state.state=="main_menu") then
 		if(btnp(2) and ui_option>1) ui_option-=1
 		if(btnp(3) and ui_option<3) ui_option+=1	
+		if(btnp(❎)) then
+			if(ui_option==1) glob_state.state="started"
+			if(ui_option==2) glob_state.state="settings"
+			if(ui_option==3) glob_state.state="exit"
+		end
+	elseif(glob_state.state=="settings") then
+		if(btnp(2) and ui_option>1) ui_option-=1
+		if(btnp(3) and ui_option<4) ui_option+=1	
 		if(btnp(❎)) then
 			if(ui_option==1) glob_state.state="started"
 			if(ui_option==2) glob_state.state="settings"
@@ -253,8 +265,27 @@ function draw_ui()
 			rect(9,59+offset,27,67+offset,7)
 			print("exit",11,61+offset,8)
 		end
-	else
+	elseif(glob_state.state=="settings") then
+		-- background shapes
+		local offset=17
+		rectfill(5,30+offset,50,70+offset,1)
+		rect(5,30+offset,50,70+offset,0)
 		
+		
+		-- ui text
+		print("grass:100",11,34+offset,6)	
+		print("dirt:100",11,43+offset,6)
+		print("water:100",11,52+offset,6)
+		print("back",11,61+offset,6)
+		if(ui_option==1) then
+			print("grass:100",11,34+offset,7)
+		elseif(ui_option==2) then
+			print("dirt:100",11,43+offset,7)
+		elseif(ui_option==3) then
+			print("water:100",11,52+offset,7)
+		elseif(ui_option==4) then
+			print("back",11,61+offset,7)
+		end
 	end
 end
 -->8
