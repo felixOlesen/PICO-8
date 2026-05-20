@@ -218,7 +218,7 @@ end
 
 function init_ui()
 	ui_option=1
-	settings_state=	
+	settings_state="none"
 end
 
 function update_ui()
@@ -227,16 +227,24 @@ function update_ui()
 		if(btnp(3) and ui_option<3) ui_option+=1	
 		if(btnp(❎)) then
 			if(ui_option==1) glob_state.state="started"
-			if(ui_option==2) glob_state.state="settings"
+			if(ui_option==2) then 
+				glob_state.state="settings"
+				ui_option=1
+			end	
 			if(ui_option==3) glob_state.state="exit"
 		end
 	elseif(glob_state.state=="settings") then
 		if(btnp(2) and ui_option>1) ui_option-=1
 		if(btnp(3) and ui_option<4) ui_option+=1	
 		if(btnp(❎)) then
-			if(ui_option==1) glob_state.state="started"
-			if(ui_option==2) glob_state.state="settings"
-			if(ui_option==3) glob_state.state="exit"
+			if(ui_option==1) settings_state="grass"
+			if(ui_option==2) settings_state="dirt"
+			if(ui_option==3) settings_state="water"
+			if(ui_option==4) then 
+				settings_state="none"
+				glob_state.state="main_menu"
+				ui_option=1
+			end
 		end
 	end
 	
