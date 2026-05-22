@@ -8,3 +8,6 @@ A procedural campfire animation using a small particle effect engine. PICO-8 Car
 
 ### Griddle
 An experiemwnt in grid-based procedural map generation. Playing around with making realistic-looking land formations.
+
+### Isometric
+3D Isometric Tilemap logic for drawing basic isometric blocks.
