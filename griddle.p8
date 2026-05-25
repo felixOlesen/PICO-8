@@ -152,7 +152,6 @@ function highlight_pass()
 end
 
 function update_grid()
-	
 end
 
 function draw_grid()
@@ -234,8 +233,14 @@ function update_ui()
 			if(ui_option==3) glob_state.state="exit"
 		end
 	elseif(glob_state.state=="settings") then
-		if(btnp(2) and ui_option>1) ui_option-=1
-		if(btnp(3) and ui_option<4) ui_option+=1	
+		if(btnp(2) and ui_option>1) then 
+			ui_option-=1
+			settings_state="none"
+		end
+		if(btnp(3) and ui_option<4) then 
+			ui_option+=1
+			settings_state="none"
+		end	
 		if(btnp(❎)) then
 			if(ui_option==1) settings_state="grass"
 			if(ui_option==2) settings_state="dirt"
@@ -246,6 +251,25 @@ function update_ui()
 				ui_option=1
 			end
 		end
+		if settings_state=="grass" then
+			if btnp(0) then grass_weight-=0.05 end
+			if btnp(1) then grass_weight+=0.05 end
+		elseif settings_state=="dirt" then
+			if btnp(0) then dirt_weight-=0.05 end
+			if btnp(1) then dirt_weight+=0.05 end
+		elseif settings_state=="water" then
+			if btnp(0) then water_weight-=0.05 end
+			if btnp(1) then water_weight+=0.05 end
+		end
+		
+		if btnp(4) then settings_state="none" end
+	end
+	
+	if btnp(4) and glob_state.state=="main_menu" then
+		grid={}
+		initial_pass()
+		procedural_gen(20)
+		highlight_pass()
 	end
 	
 end
@@ -273,26 +297,44 @@ function draw_ui()
 			rect(9,59+offset,27,67+offset,7)
 			print("exit",11,61+offset,8)
 		end
+		
+		print("press z:refresh map",30,120,15)
 	elseif(glob_state.state=="settings") then
 		-- background shapes
 		local offset=17
-		rectfill(5,30+offset,50,70+offset,1)
-		rect(5,30+offset,50,70+offset,0)
+		rectfill(5,30+offset,60,70+offset,1)
+		rect(5,30+offset,60,70+offset,0)
 		
 		
 		-- ui text
-		print("grass:100",11,34+offset,6)	
-		print("dirt:100",11,43+offset,6)
-		print("water:100",11,52+offset,6)
+		print("grass:"..(grass_weight),11,34+offset,6)	
+		print("dirt:"..(dirt_weight),11,43+offset,6)
+		print("water:"..(water_weight),11,52+offset,6)
 		print("back",11,61+offset,6)
+		local f_color=7
 		if(ui_option==1) then
-			print("grass:100",11,34+offset,7)
+			if (settings_state=="grass") then 
+				f_color=9
+			else
+				f_color=7
+			end
+			print("grass:"..(grass_weight),11,34+offset,f_color)
 		elseif(ui_option==2) then
-			print("dirt:100",11,43+offset,7)
+			if (settings_state=="dirt") then 
+				f_color=9
+			else
+				f_color=7
+			end
+			print("dirt:"..(dirt_weight),11,43+offset,f_color)
 		elseif(ui_option==3) then
-			print("water:100",11,52+offset,7)
+			if (settings_state=="water") then 
+				f_color=9
+			else
+				f_color=7
+			end
+			print("water:"..(water_weight),11,52+offset,f_color)
 		elseif(ui_option==4) then
-			print("back",11,61+offset,7)
+			print("back",11,61+offset,f_color)
 		end
 	end
 end
