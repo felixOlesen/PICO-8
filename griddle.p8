@@ -81,9 +81,9 @@ function initial_pass()
 		add(grid, {})
 		for x=1, num_cells do
 			local tile_type=rnd(3)
-			if(tile_type<1) add(grid[y],dirt)
-			if(tile_type>=1 and tile_type<2) add(grid[y],grass)
-			if(tile_type>=2) add(grid[y],water)
+			if(tile_type<1) add(grid[y],{tile=dirt,object=nil})
+			if(tile_type>=1 and tile_type<2) add(grid[y],{tile=grass,objec=nil})
+			if(tile_type>=2) add(grid[y],{tile=water,object=nil})
 		end
 	end
 end
@@ -101,9 +101,9 @@ function procedural_gen(num_passes)
 				local prob_sum=gr_prob+wa_prob+di_prob
 				local choice=rnd(prob_sum)
 				
-				if(choice>di_prob+wa_prob) add(new_grid[y],grass)
-				if(choice<=di_prob+wa_prob and choice>di_prob) add(new_grid[y],water)
-				if(choice<=di_prob) add(new_grid[y],dirt)
+				if(choice>di_prob+wa_prob) add(new_grid[y],{tile=grass,object=nil})
+				if(choice<=di_prob+wa_prob and choice>di_prob) add(new_grid[y],{tile=water,object=nil})
+				if(choice<=di_prob) add(new_grid[y],{tile=dirt,object=nil})
 			end
 		end
 		grid=new_grid	
@@ -113,12 +113,12 @@ end
 function count_adjacent_tiles(x,y)
 	local counts={gr=0,wa=0,di=0}
 	local cell_type=grass
-	local middle_cell=grid[y][x]
+	local middle_cell=grid[y][x].tile
 	for i=-1,1 do
 		for j=-1,1 do
 			if not(i==0 and j==0) then
 				if x+i>=1 and y+j>=1 and x+i<=num_cells and y+j<=num_cells then
-					cell_type=grid[y+j][x+i]
+					cell_type=grid[y+j][x+i].tile
 					if(cell_type==grass) counts.gr+=1
 					if(cell_type==water) counts.wa+=1
 					if(cell_type==dirt) counts.di+=1
@@ -136,14 +136,14 @@ function highlight_pass()
 			add(new_grid,{})
 			for x=1, num_cells do
 				local t_cnt=count_adjacent_tiles(x,y)
-				local mid_cell=grid[y][x]
-				if(t_cnt.wa==0 and t_cnt.di==0) then add(new_grid[y],light_grass)
-				elseif(t_cnt.gr==0 and t_cnt.di==0) then add(new_grid[y],deep_water)
-				elseif(t_cnt.wa==0 and t_cnt.gr==0) then add(new_grid[y],rock)
-				elseif(((t_cnt.wa==0 or t_cnt.wa==1) and mid_cell==water) and t_cnt.gr>=t_cnt.di) then add(new_grid[y],grass)
-				elseif(((t_cnt.wa==0 or t_cnt.wa==1) and mid_cell==water) and t_cnt.gr<t_cnt.di) then add(new_grid[y],dirt)
-				elseif(((t_cnt.di==0 or t_cnt.di==1) and mid_cell==dirt) and t_cnt.gr<t_cnt.wa) then add(new_grid[y],water)
-				elseif(((t_cnt.di==0 or t_cnt.di==1) and mid_cell==dirt) and t_cnt.gr>=t_cnt.wa) then add(new_grid[y],grass)
+				local mid_cell=grid[y][x].tile
+				if(t_cnt.wa==0 and t_cnt.di==0) then add(new_grid[y],{tile=light_grass,object=nil})
+				elseif(t_cnt.gr==0 and t_cnt.di==0) then add(new_grid[y],{tile=deep_water,object=nil})
+				elseif(t_cnt.wa==0 and t_cnt.gr==0) then add(new_grid[y],{tile=rock,object=nil})
+				elseif(((t_cnt.wa==0 or t_cnt.wa==1) and mid_cell==water) and t_cnt.gr>=t_cnt.di) then add(new_grid[y],{tile=grass,object=nil})
+				elseif(((t_cnt.wa==0 or t_cnt.wa==1) and mid_cell==water) and t_cnt.gr<t_cnt.di) then add(new_grid[y],{tile=dirt,object=nil})
+				elseif(((t_cnt.di==0 or t_cnt.di==1) and mid_cell==dirt) and t_cnt.gr<t_cnt.wa) then add(new_grid[y],{tile=water,object=nil})
+				elseif(((t_cnt.di==0 or t_cnt.di==1) and mid_cell==dirt) and t_cnt.gr>=t_cnt.wa) then add(new_grid[y],{tile=grass,object=nil})
 				else add(new_grid[y],grid[y][x])
 				end
 			end
@@ -168,7 +168,7 @@ function draw_grid_square(cell_x,cell_y)
 	local y_1=cell_y*cell_size
 	local x_0=x_1-cell_size
 	local y_0=y_1-cell_size
-	local cell_col=grid[cell_y][cell_x]
+	local cell_col=grid[cell_y][cell_x].tile
 	if cell_x >= num_cells then
 		x_1-=1
 	end
@@ -276,7 +276,7 @@ function update_ui()
 	if glob_state.state=="started" then
 		if(btnp(4)) then
 			ui_option+=1
-			if(ui_option>4) ui_option=1
+			if(ui_option>5) ui_option=1
 		end
 	end
 	
@@ -347,36 +347,28 @@ function draw_ui()
 	
 	elseif glob_state.state=="started" then
 		-- base shapes
-		rectfill(2,107,20,125,0)
-		rect(2,107,20,125,9)
+		rectfill(2,115,11,124,0)
+		rect(2,115,11,124,9)
 		
 		-- sprites
-		spr(6,3,109)
-		spr(7,12,109)
-		spr(8,3,117)
-		spr(9,12,117)
-		
-		-- selector
-		local sel_x=3
-		local sel_y=109
+		local spr_num=6
 		if ui_option==1 then
-			sel_x=3
-			sel_y=109
+			spr_num=6
 			object_state="house"
 		elseif ui_option==2 then
-			sel_x=12
-			sel_y=109
+			spr_num=7
 			object_state="mine"
 		elseif ui_option==3 then
-			sel_x=3
-			sel_y=117
+			spr_num=8
 			object_state="well"
 		elseif ui_option==4 then
-			sel_x=12
-			sel_y=117
+			spr_num=9
 			object_state="lumber_hut"
+		elseif ui_option==5 then
+			spr_num=12
+			object_state="road"
 		end
-		spr(17,sel_x,sel_y)
+		spr(spr_num,3,116)
 	end
 end
 -->8
@@ -423,6 +415,80 @@ completed:
 -- helpers
 
 -- game logic
+function update_road_rules()
+	-- loop through all roads
+	-- check adjacent tiles for roads
+	if count(roads)>0 then
+		for road in all(roads) do
+			local north=false
+			local east=false
+			local south=false
+			local west=false
+			--north
+			if road.y-1>=0 then
+				--one indexed: +1 -1
+				if grid[road.y][road.x+1].object != nil and grid[road.y][road.x+1].object.obj_type=="road" then
+					north=true
+				end
+			end
+			--east
+			if road.x+1<#grid[1] then
+				--one indexed: +1 +1
+				if grid[road.y+1][road.x+2].object != nil and grid[road.y+1][road.x+2].object.obj_type=="road" then
+					east=true
+				end
+			end
+			--south
+			if road.y+1<#grid then
+				--one indexed: +1 +1
+				if grid[road.y+2][road.x+1].object != nil and grid[road.y+2][road.x+1].object.obj_type=="road" then
+					south=true
+				end
+			end
+			--west		
+			if road.x-1>=0 then
+				--one indexed: +1 -1
+				if grid[road.y+1][road.x].object != nil and grid[road.y+1][road.x].object.obj_type=="road" then
+					west=true
+				end
+			end
+			
+			if north and east and west and south then
+				road.spr_id=12
+			elseif north and east and west then
+				road.spr_id=46
+			elseif south and east and west then
+				road.spr_id=15
+			elseif south and north and west then
+				road.spr_id=31
+			elseif south and north and east then
+				road.spr_id=47
+			elseif south and north then
+				road.spr_id=13
+			elseif east and west then
+				road.spr_id=11
+			elseif north and west then
+				road.spr_id=29
+			elseif north and east then
+				road.spr_id=28
+			elseif south and west then
+				road.spr_id=27
+			elseif south and east then
+				road.spr_id=14
+			elseif north then
+				road.spr_id=30
+			elseif east then
+				road.spr_id=45
+			elseif south then
+				road.spr_id=43
+			elseif west then
+				road.spr_id=44
+			end
+			
+		end
+	end
+	
+end
 
 -- drawing
 
@@ -432,11 +498,14 @@ function draw_on_grid(x,y,spr_id,scale)
  
  spr(spr_id,x_pos,y_pos)
 end
+
+
 -->8
 -- items
 
 function init_objects()
 	objects={}
+	roads={}
 end
 
 function update_objects()
@@ -454,40 +523,54 @@ function draw_objects()
 end
 
 function add_object(object_type)
+	if(grid[player.y+1][player.x+1].object != nil) then
+		return
+	end
+	if(grid[player.y+1][player.x+1].tile==water) then
+		return
+	end
+
 	local spr_num=16
 	if(object_type=="house") spr_num=6
 	if(object_type=="mine") spr_num=7
 	if(object_type=="well") spr_num=8
 	if(object_type=="lumber_hut") spr_num=9
+	if(object_type=="road") spr_num=12
 	
 	local object={x=player.x,
 													y=player.y,
-													spr_id=spr_num}
+													spr_id=spr_num,
+													obj_type=object_type}
 	
 	add(objects,object)
+	grid[player.y+1][player.x+1].object=object
+	if(object_type=="road") then
+	 add(roads,object)
+	 update_road_rules()
+	end
 end
 __gfx__
 00000000111100001000000000000100000110000000000000000161000000000011110000000000000000000000000000144100001441000000000000000000
 01100110100100000100000000001410001661000000c00000001610000110000188881000100000000000000000000000144100001441000000000000000000
-0100001010010000000000000001444101666610000cc00000111210001551001888888101b10100000000001111111111144111001441000001111100000000
-000000001111000000000000001442210166661000c7cc000188881001555510014cc4101bbb1810000000004444444444444444001441000014444400000000
-0000000000000000000000000144211001d66d1000cccc001888888101588510016cc610bbbb8f81000000004444444444444444001441000014444400000000
-01000010000000000000000014421000015dd510001cc10001f4cf101541145101d66d101343f4c8000000001111111111144111001441000014411100000000
-01100110000000000000000012210000001551000001100001f4ff1015411451001dd1000141f4f1000000000000000000144100001441000014410000000000
-00000000000000000000000001100000000110000000000000111100011111100001100000101110000000000000000000144100001441000014410000000000
-00000000770000770000000000000000000000000000000000000161000000000011110000000000000000000000000000144100001441000014410000000000
-080000807000000700000000001100000000000000000000000016100001100001bbbb1000100000000000000000000000144100001441000014410000000000
-00800800000000000000000001841000000000000000000000111210001551001bbbbbb101310100000000001111100000144111111441000014410000000000
-00088000000000000000000016884100000000000000000001bbbb1001555510014cc41013331b10000000004444410000144444444441000014410000000000
-0008800000000000000000000161141000000000000000001bbbbbb1015bb510016cc61033333fb1000000004444410000144444444441000001100000000000
-00800800000000000000000000100141000000000000000001f4cf101541145101d66d101242f4cb000000001114410000011111111110000000000000000000
-08000080700000070000000000000010000000000000000001f4ff1015411451001dd1000141f4f1000000000014410000000000000000000000000000000000
-00000000770000770000000000000000000000000000000000111100011111100001100000101110000000000014410000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011110000000011110000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001100044441000000144440000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410044441000000144440000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410011110000000011110000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410000000000000000000000000000000000
+0100001010010000000000000001444101666610000cc00000111210001551001888888101b10100000000001111111111144111001441000001111111111111
+000000001111000000000000001442210166661000c7cc000188881001555510014cc4101bbb1810000000004444444444444444001441000014444444444444
+0000000000000000000000000144211001d66d1000cccc001888888101588510016cc610bbbb8f81000000004444444444444444001441000014444444444444
+01000010000000000000000014421000015dd510001cc10001f4cf101541145101d66d101343f4c8000000001111111111144111001441000014411111144111
+01100110000000000000000012210000001551000001100001f4ff1015411451001dd1000141f4f1000000000000000000144100001441000014410000144100
+00000000000000000000000001100000000110000000000000111100011111100001100000101110000000000000000000144100001441000014410000144100
+00000000770000770000000000000000000000000000000000000161000000000011110000000000000000000000000000144100001441000014410000144100
+080000807000000700000000001100000000000000000000000016100001100001bbbb1000100000000000000000000000144100001441000014410000144100
+00800800000000000000000001841000000000000000000000111210001551001bbbbbb101310100000000001111100000144111111441000014410011144100
+00088000000000000000000016884100000000000000000001bbbb1001555510014cc41013331b10000000004444410000144444444441000014410044444100
+0008800000000000000000000161141000000000000000001bbbbbb1015bb510016cc61033333fb1000000004444410000144444444441000001100044444100
+00800800000000000000000000100141000000000000000001f4cf101541145101d66d101242f4cb000000001114410000011111111110000000000011144100
+08000080700000070000000000000010000000000000000001f4ff1015411451001dd1000141f4f1000000000014410000000000000000000000000000144100
+00000000770000770000000000000000000000000000000000111100011111100001100000101110000000000014410000000000000000000000000000144100
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410000144100
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410000144100
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011110000000011111114411100144111
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001100044441000000144444444444400144444
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410044441000000144444444444400144444
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410011110000000011111111111100144111
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410000000000000000000000000000144100
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000014410000000000000000000000000000144100
