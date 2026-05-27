@@ -501,7 +501,7 @@ end
 
 
 -->8
--- items
+-- objects
 
 function init_objects()
 	objects={}
@@ -540,7 +540,17 @@ function add_object(object_type)
 	local object={x=player.x,
 													y=player.y,
 													spr_id=spr_num,
-													obj_type=object_type}
+													obj_type=object_type,
+													tile=grid[player.y+1][player.x+1].tile,
+													gen_w={grass=1,
+																		dirt=1,
+																		rock=1,
+																		ice=1},
+													gen={stone=1,
+																		wood=2,
+																		water=3,
+																		food=0}
+													}
 	
 	add(objects,object)
 	grid[player.y+1][player.x+1].object=object
