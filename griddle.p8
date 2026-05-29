@@ -531,25 +531,74 @@ function add_object(object_type)
 	end
 
 	local spr_num=16
-	if(object_type=="house") spr_num=6
-	if(object_type=="mine") spr_num=7
-	if(object_type=="well") spr_num=8
-	if(object_type=="lumber_hut") spr_num=9
-	if(object_type=="road") spr_num=12
-	
+
+	local dirt_w=1
+	local grass_w=1
+	local rock_w=1
+	local ice_w=1
+
+	local g_stone=0
+ local g_wood=0
+ local g_water=0
+ local g_food=0
+ 
+	if(object_type=="house") then
+		spr_num=6
+		dirt_w=1
+		grass_w=1
+		rock_w=0.5
+		ice_w=0.75
+		g_stone=0
+	 g_wood=0
+	 g_water=0
+	 g_food=2
+	elseif(object_type=="mine") then 
+		spr_num=7
+		dirt_w=0.5
+		grass_w=0.25
+		rock_w=1
+		ice_w=0
+		g_stone=2
+	 g_wood=0
+	 g_water=0
+	 g_food=0
+	elseif(object_type=="well") then 
+		spr_num=8
+		dirt_w=1
+		grass_w=0.5
+		rock_w=0
+		ice_w=1
+		g_stone=0
+	 g_wood=0
+	 g_water=2
+	 g_food=0
+	elseif(object_type=="lumber_hut") then 
+		spr_num=9
+		dirt_w=0.25
+		grass_w=1
+		rock_w=0
+		ice_w=0
+		g_stone=0
+	 g_wood=2
+	 g_water=0
+	 g_food=0
+	elseif(object_type=="road") then 
+		spr_num=12
+	end
+
 	local object={x=player.x,
 													y=player.y,
 													spr_id=spr_num,
 													obj_type=object_type,
 													tile=grid[player.y+1][player.x+1].tile,
-													gen_w={grass=1,
-																		dirt=1,
-																		rock=1,
-																		ice=1},
-													gen={stone=1,
-																		wood=2,
-																		water=3,
-																		food=0}
+													gen_w={grass=grass_w,
+																		dirt=dirt_w,
+																		rock=rock_w,
+																		ice=ice_w},
+													gen={stone=g_stone,
+																		wood=g_wood,
+																		water=g_water,
+																		food=g_food}
 													}
 	
 	add(objects,object)
