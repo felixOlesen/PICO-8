@@ -60,7 +60,7 @@ function init_grid()
 	sand=15
 	light_grass=13
 	rock=13
-	deep_water=7
+	ice=7
 	
 	grid={}
 	num_cells=screen_size/cell_size
@@ -138,7 +138,7 @@ function highlight_pass()
 				local t_cnt=count_adjacent_tiles(x,y)
 				local mid_cell=grid[y][x].tile
 				if(t_cnt.wa==0 and t_cnt.di==0) then add(new_grid[y],{tile=light_grass,object=nil})
-				elseif(t_cnt.gr==0 and t_cnt.di==0) then add(new_grid[y],{tile=deep_water,object=nil})
+				elseif(t_cnt.gr==0 and t_cnt.di==0) then add(new_grid[y],{tile=ice,object=nil})
 				elseif(t_cnt.wa==0 and t_cnt.gr==0) then add(new_grid[y],{tile=rock,object=nil})
 				elseif(((t_cnt.wa==0 or t_cnt.wa==1) and mid_cell==water) and t_cnt.gr>=t_cnt.di) then add(new_grid[y],{tile=grass,object=nil})
 				elseif(((t_cnt.wa==0 or t_cnt.wa==1) and mid_cell==water) and t_cnt.gr<t_cnt.di) then add(new_grid[y],{tile=dirt,object=nil})
@@ -499,6 +499,39 @@ function draw_on_grid(x,y,spr_id,scale)
  spr(spr_id,x_pos,y_pos)
 end
 
+function get_gen_yield(object)
+	local stone_sum=object.gen.stone
+	local water_sum=object.gen.water
+	local food_sum=object.gen.food
+	local wood_sum=object.gen.wood
+	
+	if object.tile==ice then
+		stone_sum*=object.gen_w.ice
+		water_sum=object.gen_w.ice
+		food_sum=object.gen_w.ice
+		wood_sum=object.gen_w.ice
+	elseif object.tile==grass then
+		stone_sum*=object.gen_w.grass
+		water_sum=object.gen_w.grass
+		food_sum=object.gen_w.grass
+		wood_sum=object.gen_w.grass
+	elseif object.tile==dirt then
+		stone_sum*=object.gen_w.dirt
+		water_sum=object.gen_w.dirt
+		food_sum=object.gen_w.dirt
+		wood_sum=object.gen_w.dirt
+	elseif object.tile==rock then
+		stone_sum*=object.gen_w.rock
+		water_sum=object.gen_w.rock
+		food_sum=object.gen_w.rock
+		wood_sum=object.gen_w.rock
+	end
+	
+	return {stone_sum,
+									water_sum,
+									food_sum,
+									wood_sum}
+end
 
 -->8
 -- objects
