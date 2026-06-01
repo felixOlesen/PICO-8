@@ -533,17 +533,35 @@ function get_gen_yield(object)
 									wood_sum}
 end
 
+function make_yield_nums(object)
+	local yields=get_gen_yield(object)
+	
+	for y in all(yields) do
+		if y > 0 then
+			add(yield_nums, {x=object.x,y=object.y,yield_num=y})
+		end
+	end
+	
+end
+
 -->8
 -- objects
 
 function init_objects()
 	objects={}
 	roads={}
+	yield_nums={{x=3,y=3,yield_num=4}}
 end
 
 function update_objects()
 	if(glob_state.state=="started") do
 		if(btnp(❎)) add_object(object_state)
+	
+		if glob_state.glob_time%30==0 then
+			for obj in all(objects) do
+				make_yield_nums(obj)
+			end
+		end
 	end
 end
 
@@ -552,6 +570,9 @@ function draw_objects()
 		spr(object.spr_id,
 		object.x*cell_size,
 		object.y*cell_size)
+	end
+	for yild in all(yield_nums) do
+		print(yild.yield_num, yild.x*cell_size, yild.y*cell_size,7)
 	end
 end
 
@@ -631,7 +652,9 @@ function add_object(object_type)
 													gen={stone=g_stone,
 																		wood=g_wood,
 																		water=g_water,
-																		food=g_food}
+																		food=g_food},
+													yld_time_max=2,
+													yld_time=2
 													}
 	
 	add(objects,object)
