@@ -538,7 +538,7 @@ function make_yield_nums(object)
 	
 	for y in all(yields) do
 		if y > 0 then
-			add(yield_nums, {x=object.x,y=object.y,yield_num=y})
+			add(yield_nums, {x=object.x,y=object.y,yield_num=y,life=3})
 		end
 	end
 	
@@ -550,7 +550,7 @@ end
 function init_objects()
 	objects={}
 	roads={}
-	yield_nums={{x=3,y=3,yield_num=4}}
+	yield_nums={}
 end
 
 function update_objects()
@@ -559,8 +559,15 @@ function update_objects()
 	
 		if glob_state.glob_time%30==0 then
 			for obj in all(objects) do
-				make_yield_nums(obj)
+				obj.yld_time -= 1
+				if obj.yld_time <= 0 then
+						make_yield_nums(obj)
+						obj.yld_time = obj.yld_time_max
+				end
 			end
+		end
+		if #yield_nums > 0 then
+			move_yield_nums()
 		end
 	end
 end
@@ -596,6 +603,8 @@ function add_object(object_type)
  local g_water=0
  local g_food=0
  
+ local yield_time_max=1
+ 
 	if(object_type=="house") then
 		spr_num=6
 		dirt_w=1
@@ -606,6 +615,7 @@ function add_object(object_type)
 	 g_wood=0
 	 g_water=0
 	 g_food=2
+	 yield_time_max=1
 	elseif(object_type=="mine") then 
 		spr_num=7
 		dirt_w=0.5
@@ -616,6 +626,7 @@ function add_object(object_type)
 	 g_wood=0
 	 g_water=0
 	 g_food=0
+	 yield_time_max=2
 	elseif(object_type=="well") then 
 		spr_num=8
 		dirt_w=1
@@ -626,6 +637,7 @@ function add_object(object_type)
 	 g_wood=0
 	 g_water=2
 	 g_food=0
+	 yield_time_max=3
 	elseif(object_type=="lumber_hut") then 
 		spr_num=9
 		dirt_w=0.25
@@ -636,8 +648,18 @@ function add_object(object_type)
 	 g_wood=2
 	 g_water=0
 	 g_food=0
+	 yield_time_max=4
 	elseif(object_type=="road") then 
 		spr_num=12
+		dirt_w=0
+		grass_w=0
+		rock_w=0
+		ice_w=0
+		g_stone=0
+	 g_wood=0
+	 g_water=0
+	 g_food=0
+	 yield_time_max=100
 	end
 
 	local object={x=player.x,
@@ -653,8 +675,8 @@ function add_object(object_type)
 																		wood=g_wood,
 																		water=g_water,
 																		food=g_food},
-													yld_time_max=2,
-													yld_time=2
+													yld_time_max=yield_time_max,
+													yld_time=yield_time_max
 													}
 	
 	add(objects,object)
@@ -662,6 +684,17 @@ function add_object(object_type)
 	if(object_type=="road") then
 	 add(roads,object)
 	 update_road_rules()
+	end
+end
+
+function move_yield_nums()
+	local y_spd=0.2
+	for num in all(yield_nums) do
+		num.y-=y_spd
+		num.life-=0.3
+		if num.life<=0 then
+			del(yield_nums,num)
+		end
 	end
 end
 __gfx__
